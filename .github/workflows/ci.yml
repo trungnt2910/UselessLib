@@ -91,5 +91,5 @@ jobs:
         run: msbuild $env:SOLUTION /p:Configuration=$env:BUILD_CONFIG /p:Platform="Any CPU" -p:Version=${{ steps.gitversion.outputs.assemblySemVer }}
 
       - name: Pack
-        run: dotnet pack UselessLib.csproj -c Release -p:PackageVersion=${{ steps.gitversion.outputs.semVer }}
+        run: msbuild -t:pack UselessLib.csproj -p:Configuration=$env:BUILD_CONFIG -p:PackageVersion=${{ steps.gitversion.outputs.semVer }}
 
