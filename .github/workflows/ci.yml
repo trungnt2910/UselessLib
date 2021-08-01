@@ -93,3 +93,8 @@ jobs:
       - name: Pack
         run: msbuild -t:pack UselessLib.csproj -p:Configuration=$env:BUILD_CONFIG -p:PackageVersion=${{ steps.gitversion.outputs.semVer }}
 
+      - name: Publish nuget artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: packages.${{ steps.gitversion.outputs.semVer }}
+          path: ./**/*.nupkg
