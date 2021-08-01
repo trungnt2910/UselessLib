@@ -1,4 +1,4 @@
-<Project Sdk="MSBuild.Sdk.Extras/3.0.23">
+﻿<Project Sdk="MSBuild.Sdk.Extras/3.0.23">
   <!--
 	Adding project references to this project requires some manual adjustments.
 	Please see https://github.com/unoplatform/uno/issues/3909 for more details.
@@ -12,6 +12,7 @@
     <PackageReference Include="GitVersion.MsBuild" Version="5.6.11">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="ToastNotification.Uno" Version="0.0.1"/>
   </ItemGroup>
   <ItemGroup>
     <Page Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml" />

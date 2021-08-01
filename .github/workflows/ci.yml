@@ -14,8 +14,13 @@ on:
     - master
 
 jobs:
-  TestGitversion:
-    runs-on: ubuntu-latest
+  Build:
+    env:
+      BUILD_CONFIG: 'Release'
+      SOLUTION: 'UselessLib.sln'
+
+    runs-on: windows-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -65,3 +70,31 @@ jobs:
           echo "CommitsSinceVersionSourcePadded: ${{ steps.gitversion.outputs.commitsSinceVersionSourcePadded }}"
           echo "UncommittedChanges: ${{ steps.gitversion.outputs.uncommittedChanges }}"
           echo "CommitDate: ${{ steps.gitversion.outputs.commitDate }}"
+        shell: pwsh
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v1.0.5
+
+      - name: Restore dependencies
+        run: nuget restore $SOLUTION
+
+      - name: Setup .NET
+        run: |
+          Invoke-WebRequest 'https://dot.net/v1/dotnet-install.ps1' -OutFile 'dotnet-install.ps1'
+          ./dotnet-install.ps1 -Channel Current
+        shell: pwsh
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.0.2
+
+      - name: Build
+        run: msbuild $env:SOLUTION /p:Configuration=$env:BUILD_CONFIG /p:Platform="Any CPU" -p:Version=${{ steps.gitversion.outputs.assemblySemVer }}
+
+      - name: Pack
+        run: msbuild -t:pack UselessLib.csproj -p:Configuration=$env:BUILD_CONFIG -p:PackageVersion=${{ steps.gitversion.outputs.semVer }}
+
+      - name: Publish nuget artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: packages.${{ steps.gitversion.outputs.semVer }}
+          path: ./**/*.nupkg
